@@ -4,7 +4,7 @@
 
 ## Overview
 
-This Python script (`datathon.py`) is designed to predict real estate prices in Toronto using a dataset of housing information. The script performs Exploratory Data Analysis (EDA), data preprocessing, feature engineering, and implements several machine learning models to predict house prices. The models used include Random Forest Regressor, Extra Trees Regressor, XGBoost Regressor, and a Feed Forward Neural Network, along with an ensemble model that averages the predictions of these individual models.
+This Python script (`datathon.ipnyb`) is designed to predict real estate prices in Toronto using a dataset of housing information. The script performs Exploratory Data Analysis (EDA), data preprocessing, feature engineering, and implements several machine learning models to predict house prices. The models used include Random Forest Regressor, Extra Trees Regressor, XGBoost Regressor, and a Feed Forward Neural Network, along with an ensemble model that averages the predictions of these individual models.
 
 This project aims to provide insights into factors influencing housing prices in Toronto and to build a predictive model that can estimate house prices based on a set of features.
 
