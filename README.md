@@ -1,83 +1,96 @@
 # Datathon
 
-# Toronto Real Estate Price Prediction
+# Toronto Real Estate Price Prediction Project
 
 ## Overview
 
-This Python script (`datathon.ipnyb`) is designed to predict real estate prices in Toronto using a dataset of housing information. The script performs Exploratory Data Analysis (EDA), data preprocessing, feature engineering, and implements several machine learning models to predict house prices. The models used include Random Forest Regressor, Extra Trees Regressor, XGBoost Regressor, and a Feed Forward Neural Network, along with an ensemble model that averages the predictions of these individual models.
+This repository contains a Python script (`datathon.py`) designed to predict real estate prices in Toronto. The project leverages a dataset of Toronto housing information to perform comprehensive Exploratory Data Analysis (EDA), rigorous data preprocessing, insightful feature engineering, and employs a suite of machine learning models to accurately estimate house prices.
 
-This project aims to provide insights into factors influencing housing prices in Toronto and to build a predictive model that can estimate house prices based on a set of features.
+The predictive models implemented include:
 
-**AI Assistance:** It's important to note that Artificial Intelligence tools were utilized in the code development process for efficiency and code generation, particularly in structuring some parts of the data cleaning and model fitting sections.
+*   **Random Forest Regressor**
+*   **Extra Trees Regressor**
+*   **XGBoost Regressor**
+*   **Feed Forward Neural Network**
 
-## Data Source
+Furthermore, an **ensemble model** is constructed to average the predictions from these individual models, aiming to enhance overall prediction accuracy and robustness.
 
-The dataset used for this project is `real-estate-data.csv`, which should be placed in the same directory as the script or accessible via the Google Drive path specified in the script if running on Google Colab. The dataset contains features related to real estate properties and their corresponding prices.
+This project provides a detailed analysis of factors influencing Toronto's housing market and delivers a robust predictive tool for estimating property values based on a variety of features.
 
-## Methodology
+**AI Assistance in Development:**  In the interest of development efficiency and code optimization, Artificial Intelligence tools played a role in structuring and generating certain segments of the codebase. This was particularly beneficial in streamlining the data cleaning processes and model fitting routines, allowing for a more focused approach on the core analytical and predictive aspects of the project.
 
-The script follows these key steps:
+## Repository Structure
+
+The repository is organized as follows:
+
+*   `.idea/`: Contains IntelliJ IDEA project files (IDE configuration).
+*   `SDSS Datathon Cases/`: Potentially contains case-related data or documents from the SDSS Datathon (context-specific folder, may not be directly relevant to running the script).
+*   `01_hierarchical_clustering.ipynb`: Jupyter Notebook exploring Hierarchical Clustering techniques. While investigated, Hierarchical Clustering was **not directly used** in the final price prediction model implemented in `datathon.py`. Associated data output from this exploration might have been saved as `data_clusters.csv`.
+*   `EDA.ipynb`, `EDA2.ipynb`, `EDA3.ipynb`: Jupyter Notebooks containing Exploratory Data Analysis (EDA) carried out on the dataset. These notebooks informed the data cleaning, preprocessing, and feature engineering steps implemented in the `datathon.py` script.
+*   `README.md`: This file, providing an overview of the project.
+*   `cleaned_data.csv`: Likely an intermediate or pre-processed version of the dataset, potentially generated during the EDA phase. Note: The primary input data should be `real-estate-data.csv`.
+*   `data_clusters.csv`: Data file potentially containing cluster assignments or results from Hierarchical Clustering exploration (not used in the final prediction model).
+*   `datathon.py`: The main Python script containing the complete data processing, feature engineering, model training, and evaluation pipeline for real estate price prediction.
+*   `real-estate-data.csv`: **The primary dataset** for this project, containing Toronto real estate data. Ensure this file is placed in the same directory as `datathon.py` or update the file path within the script.
+
+## Methodology in Detail
+
+The `datathon.py` script executes the following steps:
 
 1.  **Exploratory Data Analysis (EDA):**
-    *   Loads the dataset and displays the first few rows (`df.head()`).
-    *   Visualizes the distribution of house prices using a histogram (`plt.hist(df['price'])`).
-    *   Generates a pairplot (`sns.pairplot(df)`) to examine pairwise correlations between features.
-    *   Identifies missing values in the dataset (`df.isnull().sum()`).
+    *   Initial dataset inspection using `df.head()`.
+    *   Visualization of house price distribution via histograms (`plt.hist(df['price'])`).
+    *   Pairwise correlation analysis of predictors using `sns.pairplot(df)`.
+    *   Identification of missing values using `df.isnull().sum()`.
+    *   Geographic visualization of house prices on a Toronto map using `plotly.express`, categorized by price quantiles and sized by price, using latitude (`lt`) and longitude (`lg`) data.
 
-2.  **Data Preprocessing:**
-    *   **Data Cleaning Pipeline:** A `Pipeline` named `data_pipeline` is constructed to handle data cleaning and imputation:
-        *   **`RealEstateDataCleaner` Transformer:**
-            *   Drops the `id_` column.
-            *   Removes rows with missing `price` values.
-            *   Encodes categorical columns (`size`, `exposure`, `DEN`, `parking`, `ward`) into numerical representations using predefined mappings (`size_mapping`, `exposure_mapping`, `den_mapping`, `parking_mapping`, `ward_mapping`).
-        *   **`SeparateImputer` Transformer:**
-            *   Imputes missing values in categorical columns (`beds`, `size`) using `KNNCategoricalImputer` (KNN-based categorical imputation).
-            *   Imputes missing values in numerical columns (`maint`, `D_mkt`) using `IterativeImputer` (MICE - Multiple Imputation by Chained Equations).
-    *   **Data Refinement:**
-        *   Removes rows where `D_mkt` is not an integer after imputation to ensure data consistency.
-        *   Creates a scatter plot of 'size' vs 'price' to visually inspect their relationship.
-        *   Creates a 'bed\_bath\_ratio' feature, visualizes its correlation with 'price' and 'maint', and then drops this ratio feature.
-        *   Visualizes house prices geographically on a Toronto map using `plotly.express`, categorizing prices into 'Low', 'Mid', and 'High' quantiles. This visualization uses latitude (`lt`) and longitude (`lg`) data.
+2.  **Data Preprocessing Pipeline:**
+    *   Implementation of a `data_pipeline` using scikit-learn `Pipeline` for streamlined data cleaning and imputation.
+    *   **`RealEstateDataCleaner` Transformer:**
+        *   Drops irrelevant `id_` column.
+        *   Removes rows with missing `price` values.
+        *   Categorical feature encoding for columns like `size`, `exposure`, `DEN`, `parking`, and `ward` using predefined mappings (`size_mapping`, `exposure_mapping`, `den_mapping`, `parking_mapping`, `ward_mapping`).
+    *   **`SeparateImputer` Transformer:**
+        *   Missing value imputation for categorical features (`beds`, `size`) using `KNNCategoricalImputer` (KNN-based).
+        *   Missing value imputation for numerical features (`maint`, `D_mkt`) using `IterativeImputer` (MICE).
+    *   Removal of rows with non-integer values in the `D_mkt` column post-imputation to ensure data integrity.
 
 3.  **Feature Engineering:**
-    *   **Local Average Price Feature:**
-        *   The function `compute_local_avg_price` calculates the average price of houses within a 700-meter radius (`radius_km = 0.7`) for each house, considering houses with the same number of bedrooms (`beds`).
-        *   It uses a `BallTree` for efficient nearest neighbor searches based on latitude (`lt`) and longitude (`lg`).
-        *   Two new features are created: `local_avg_price` (the computed average price) and `local_neighbor_count` (the number of neighbors used for the average).
-    *   Latitude (`lt`) and longitude (`lg`) columns are dropped after feature engineering as they are no longer directly used in the models.
+    *   **`compute_local_avg_price` Function:**
+        *   Calculates `local_avg_price`: For each house, computes the average price of neighboring houses (within a 700-meter radius, `radius_km = 0.7`) with the same number of bedrooms, using a `BallTree` for efficient spatial queries based on latitude (`lt`) and longitude (`lg`).
+        *   Calculates `local_neighbor_count`:  Counts the number of neighboring houses used to compute `local_avg_price`.
+    *   Latitude (`lt`) and longitude (`lg`) columns are dropped after engineering local price features as they are no longer directly used by the predictive models.
 
-4.  **Model Fitting and Evaluation:**
-    *   **Data Splitting:** The cleaned and engineered dataset is split into training and testing sets (`train_test_split`) with an 80/20 ratio.
-    *   **Feature Scaling:** Numerical features in both training and testing sets are scaled using `StandardScaler`.
-    *   **Regression Models:** Four regression models are trained and evaluated:
-        *   **Random Forest Regressor (`RandomForestRegressor`)**
-        *   **Extra Trees Regressor (`ExtraTreesRegressor`)**
-        *   **XGBoost Regressor (`XGBRegressor`)**
-        *   **Feed Forward Neural Network (`Sequential` from Keras):** A simple neural network with ReLU activation functions and an output layer for regression.
-    *   **Ensemble Model:** An ensemble prediction is created by averaging the predictions of all four models.
-    *   **Evaluation Metric:** Root Mean Squared Error (RMSE) is used to evaluate the performance of each model and the ensemble model.
-    *   **Custom Accuracy Metric:** A custom "accuracy" metric is calculated, defining a prediction as "accurate" if it falls within 15% of the actual price.
-    *   **Results Visualization:**
-        *   For each model (Random Forest, Extra Trees, XGBoost, Neural Network, Ensemble), scatter plots of "Predicted Price vs Actual Price" and histograms of "Error Distribution" are generated to visually assess model performance.
-        *   A summary table (`results`) is printed, comparing the RMSE of all models.
+4.  **Model Training and Evaluation:**
+    *   Dataset split into training (`train_df`) and testing (`test_df`) sets using `train_test_split` (80/20 split).
+    *   Feature scaling using `StandardScaler` applied to numerical features in both training (`X_train_scaled`) and testing (`X_test_scaled`) sets.
+    *   Training and evaluation of four regression models:
+        *   `rf`: `RandomForestRegressor`
+        *   `et`: `ExtraTreesRegressor`
+        *   `xgb`: `XGBRegressor`
+        *   `nn_model`: Feed Forward Neural Network (Keras `Sequential` model).
+    *   Ensemble prediction (`ensemble_pred`) by averaging predictions from all four models.
+    *   Model evaluation using Root Mean Squared Error (RMSE) and a custom accuracy metric (predictions within 15% of actual price).
+    *   Visualizations of model performance: Scatter plots of Predicted vs Actual prices and histograms of error distributions for each model and the ensemble.
+    *   Comparison table (`results`) summarizing RMSE for all models.
 
-## Key Variables
+## Key Variables in `datathon.py`
 
-*   **`df`**: Initial Pandas DataFrame loaded from `real-estate-data.csv`.
-*   **`cleaned_df`**: Pandas DataFrame after applying the `data_pipeline` for cleaning and imputation.
-*   **`data_pipeline`**: Scikit-learn `Pipeline` object encapsulating data cleaning and imputation steps.
-*   **`X_train`, `y_train`, `X_test`, `y_test`**: Training and testing feature matrices and target vectors (price).
-*   **`X_train_scaled`, `X_test_scaled`**: Scaled training and testing feature matrices after applying `StandardScaler`.
-*   **`rf`, `et`, `xgb`, `nn_model`**: Trained machine learning models (Random Forest, Extra Trees, XGBoost, Neural Network).
-*   **`rf_pred`, `et_pred`, `xgb_pred`, `nn_pred`**: Price predictions from each individual model on the test set.
-*   **`ensemble_pred`**: Ensemble price predictions, averaged from individual model predictions.
-*   **`rf_rmse`, `et_rmse`, `xgb_rmse`, `loss` (NN Loss), `ensemble_rmse`**: Root Mean Squared Error values for each model.
-*   **`accuracy`**: Custom accuracy metric for the Random Forest model (percentage of predictions within 15% error).
-*   **`errors`, `errors_et`, `errors_xgb`, `errors_ensemble`, `errors_rf`**: Error arrays (Predicted - Actual prices) for each model used for error distribution plots.
+*   **`df`**:  Initial Pandas DataFrame loaded from `real-estate-data.csv`.
+*   **`cleaned_df`**: Pandas DataFrame after preprocessing and imputation via `data_pipeline`.
+*   **`data_pipeline`**: Scikit-learn `Pipeline` for data cleaning and imputation.
+*   **`X_train`, `y_train`, `X_test`, `y_test`**: Training and testing feature matrices and target variable (house price).
+*   **`X_train_scaled`, `X_test_scaled`**: Scaled feature matrices for training and testing data.
+*   **`rf`, `et`, `xgb`, `nn_model`**: Instances of trained regression models (Random Forest, Extra Trees, XGBoost, Neural Network).
+*   **`rf_pred`, `et_pred`, `xgb_pred`, `nn_pred`**: Price predictions generated by each model on the test set.
+*   **`ensemble_pred`**: Averaged price predictions from the ensemble model.
+*   **`rf_rmse`, `et_rmse`, `xgb_rmse`, `loss` (NN Loss), `ensemble_rmse`**: Root Mean Squared Error values for each model's performance.
+*   **`accuracy`**: Custom accuracy metric (percentage of Random Forest predictions within 15% of the actual price).
+*   **`errors`, `errors_et`, `errors_xgb`, `errors_ensemble`, `errors_rf`**: Arrays of prediction errors (Predicted - Actual price) for each model, used for error distribution visualization.
 
-## Model Performance
+## Model Performance Summary
 
-The script outputs a table comparing the RMSE for each model and the ensemble model. The Ensemble model generally shows the lowest RMSE, indicating better predictive performance compared to individual models in terms of RMSE. However, when considering the custom accuracy metric (predictions within 15% error), the Random Forest Regressor shows a competitive result. Visualizations are provided to further analyze the performance of each model, showing predicted vs. actual prices and error distributions.
+The project evaluates and compares the performance of four individual regression models and an ensemble model. Based on the Root Mean Squared Error (RMSE), the ensemble model achieves the lowest error, suggesting superior predictive capability in terms of RMSE. However, when considering a custom accuracy metric that measures predictions within a 15% error margin, the Random Forest Regressor demonstrates strong performance. The generated visualizations offer further insights into each model's prediction accuracy and error patterns.
 
 ## Dependencies
 
@@ -86,12 +99,12 @@ The script outputs a table comparing the RMSE for each model and the ensemble mo
 *   `numpy`
 *   `matplotlib`
 *   `seaborn`
-*   `sklearn` (scikit-learn): `BaseEstimator`, `TransformerMixin`, `Pipeline`, `IterativeImputer`, `NearestNeighbors`, `train_test_split`, `StandardScaler`, `mean_squared_error`, `RandomForestRegressor`, `ExtraTreesRegressor`
-*   `scipy`: `stats.mode`
+*   `scipy`
+*   `sklearn` (scikit-learn)
 *   `xgboost`
 *   `keras`
 
-To install the required packages, you can use pip:
+Install dependencies using pip:
 
 ```bash
-pip install pandas numpy matplotlib seaborn scikit-learn scipy xgboost keras
+pip install pandas numpy matplotlib seaborn scikit-learn scipy xgboost keras plotly_express
